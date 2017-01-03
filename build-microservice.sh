@@ -18,7 +18,7 @@ else
 	echo "Neither wget nor curl is installed. Cannot retrieve zipkin.jar."
 	exit 1
 fi
-	
+
 if [[ ${DO_DOCKER} == 'yes' ]]; then
   cp zipkin.jar docker/app.jar
   cd docker/
