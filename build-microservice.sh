@@ -1,26 +1,33 @@
 #!/bin/bash
 
 IMAGE_NAME=zipkin
+MAVEN_BUILD_TARGET=target/zipkin-0.0.1-SNAPSHOT.jar
+GRADLE_BUILD_TARGET=build/libs/zipkin-0.0.1-SNAPSHOT.jar
 
-while getopts "d" ARG; do
+while getopts "md" ARG; do
   case ${ARG} in
+    m)
+      USE_MAVEN='yes'
+      ;;
     d)
       DO_DOCKER='yes'
       ;;
   esac
 done
 
-if [[ $(which curl) ]]; then
-	curl -L --output zipkin.jar 'https://search.maven.org/remote_content?g=io.zipkin.java&a=zipkin-server&v=LATEST&c=exec'
-elif [[ $(which wget) ]]; then
-	wget -O zipkin.jar 'https://search.maven.org/remote_content?g=io.zipkin.java&a=zipkin-server&v=LATEST&c=exec'
+if [[ ${USE_MAVEN} == 'yes' ]]; then
+  mvn clean package
+  if [[ ${DO_DOCKER} == 'yes' ]]; then
+    cp ${MAVEN_BUILD_TARGET} docker/app.jar
+  fi
 else
-	echo "Neither wget nor curl is installed. Cannot retrieve zipkin.jar."
-	exit 1
+  ./gradlew clean build
+  if [[ ${DO_DOCKER} == 'yes' ]]; then
+	cp ${GRADLE_BUILD_TARGET} docker/app.jar
+  fi
 fi
 
 if [[ ${DO_DOCKER} == 'yes' ]]; then
-  cp zipkin.jar docker/app.jar
   cd docker/
   docker build -t ${IMAGE_NAME} .
 fi
