@@ -1,4 +1,4 @@
-package com.ibm.microservices.refapp.eureka;
+package com.ibm.microservices.refapp.zipkin;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
